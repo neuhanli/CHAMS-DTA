@@ -321,32 +321,32 @@ class CrossHybridAttention(nn.Module):
 
     def forward(self, x, y):
         """
-        x: [B, L, C] (如蛋白分支)
-        y: [B, L, C] (如药物分支)
-        返回: [B, C] 逐位置的注意力分数 (对 x 侧而言)
+        x: [B, C, L] (如蛋白分支)
+        y: [B, C, L] (如药物分支)
+        返回: [B, L] 逐位置的注意力分数 (对 x 侧而言)
         """
         # -----------------------------
         # 1) 跨模态注意力
         # -----------------------------
-        # cross_out: [B, L, C]   (x 的更新), cross_weights: [B, C, C]
+        # cross_out: [B, C, L]   (x 的更新), cross_weights: [B, L, L]
         cross_out, cross_weights = self.cross_att(x, y)
 
         # cross_out 中各位置的特征可做简单压缩(例如 max-pool 以得到分数)
-        # 这里演示按通道 max-pool => [B, C]
-        cross_scores, _ = cross_weights.max(dim=-1)  # [B, C]
+        # 这里演示按通道 max-pool => [B, L]
+        cross_scores, _ = cross_weights.max(dim=-1)  # [B, L]
 
 
         # -----------------------------
         # 2) 局部注意力 (对 x 自身)
         # -----------------------------
-        local_weights = self.local_att(x)       # [B, 1, C]
-        local_scores = local_weights.squeeze(1) # [B, C]
+        local_weights = self.local_att(x)       # [B, 1, L]
+        local_scores = local_weights.squeeze(1) # [B, L]
 
         # -----------------------------
         # 3) 门控融合: cross_scores & local_scores
         # -----------------------------
-        gating_input = torch.stack((cross_scores, local_scores), dim=-1)  # [B, C, 2]
-        alpha = self.gate_mlp(gating_input).squeeze(-1)                  # [B, C], 取值(0,1)
+        gating_input = torch.stack((cross_scores, local_scores), dim=-1)  # [B, L, 2]
+        alpha = self.gate_mlp(gating_input).squeeze(-1)                  # [B, L], 取值(0,1)
 
         # 最终融合：fused_scores = α * cross_scores + (1 - α) * local_scores
         fused_scores = alpha * cross_scores + (1. - alpha) * local_scores
