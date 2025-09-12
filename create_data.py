@@ -182,8 +182,6 @@ def create_dataset(dataset,fold=0):
         with open('data/' + dataset + '_' + opt + '.csv', 'w') as f:
             f.write('compound_iso_smiles,target_key,target_sequence,affinity,dip\n')
             for pair_ind in range(len(rows)):
-                if not valid_target(prot_keys[cols[pair_ind]], dataset):  # Check if there are aln and pconsc4 files
-                    continue
                 ls = []
                 ls += [drugs[rows[pair_ind]]]
                 ls += [prot_keys[cols[pair_ind]]]
@@ -202,10 +200,7 @@ def create_dataset(dataset,fold=0):
     target_key = prot_keys
     # durg graph data
     smile_graph = {}
-    for smile in compound_iso_smiles:
-        g = smile_to_graph(smile)
-        smile_graph[smile] = g
-    print('finish drug graph')
+
     # drug sequence data
     smile_tensor = {}
     for smile in compound_iso_smiles:
