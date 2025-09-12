@@ -6,7 +6,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 from timm.layers import DropPath
-from transformer_xtd import SMILES_FASTAModel_xtd
+
 
 import torch.nn.functional as F
 class MLP_xd(nn.Module):
