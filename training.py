@@ -147,7 +147,7 @@ for dataset in datasets:
             best_ci = ret[1]
             rm2 = ret[2]
             print('mse improved at epoch ', best_epoch, '; best_mse,best_ci,rm2:', best_mse, best_ci, rm2, model_st, dataset)
-        elif (epoch - best_epoch)<500:
+        elif (epoch - best_epoch)<200:
             print(ret[0], 'No improvement since epoch ', best_epoch, '; best_mse,best_ci,rm2:', best_mse, best_ci, rm2, model_st, dataset)
         else:
             print('early stop  ''; best_mse,best_ci,rm2:', best_mse, best_ci, rm2, model_st, dataset)
